@@ -19,25 +19,20 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
-    console.log('Login attempt for email:', loginDto.email); // Debug log
     const { email, password } = loginDto;
     const user = await this.userModel.findOne({ email }).exec();
     if (!user) {
-      console.log('User not found:', email); // Debug log
       throw new UnauthorizedException('Invalid credentials');
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('Password mismatch for:', email); // Debug log
       throw new UnauthorizedException('Invalid credentials');
     }
     const payload = {
       sub: String(user._id),
       email: user.email,
     };
-    console.log('Creating token with payload:', payload); // Debug log
     const accessToken = await this.jwtService.signAsync(payload);
-    console.log('Token created successfully'); // Debug log
     return { accessToken };
   }
 

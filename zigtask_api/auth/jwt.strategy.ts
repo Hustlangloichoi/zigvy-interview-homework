@@ -13,7 +13,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     const secret: string =
       configService.get<string>('JWT_SECRET') || 'abcdxyz1234';
-    console.log('JWT_SECRET being used:', secret); // Debug log
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -23,7 +22,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: JwtPayload): { id: string; email: string } {
-    console.log('JWT payload received:', payload); // Debug log
     return { id: payload.sub, email: payload.email };
   }
 }
