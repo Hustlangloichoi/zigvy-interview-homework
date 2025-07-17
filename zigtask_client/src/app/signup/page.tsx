@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useGuestRedirect } from "@/lib/hooks/useAuthRedirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,12 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { signup } = useAuthStore();
+  const { isAuthenticated } = useGuestRedirect();
   const router = useRouter();
+
+  if (isAuthenticated) {
+    return null; // Will redirect to dashboard
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

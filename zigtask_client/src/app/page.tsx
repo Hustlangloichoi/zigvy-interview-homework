@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useGuestRedirect } from "@/lib/hooks/useAuthRedirect";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,16 +13,9 @@ import { CheckCircle, Clock, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {
-  const { user } = useAuthStore();
-  const router = useRouter();
+  const { isAuthenticated } = useGuestRedirect();
 
-  useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
-  }, [user, router]);
-
-  if (user) {
+  if (isAuthenticated) {
     return null; // Will redirect to dashboard
   }
 

@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState, useEffect } from "react";
 import { useTaskStore } from "@/lib/stores/task-store";
-import type { Task, TaskPriority, TaskStatus } from "@/lib/types";
+import type { Task, TaskStatus } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface TaskDialogProps {
   open: boolean;
@@ -44,10 +45,10 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
   const { createTask, updateTask } = useTaskStore();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState<TaskPriority>("MEDIUM");
   const [status, setStatus] = useState<TaskStatus>("TODO");
   const [dueDate, setDueDate] = useState<Date>();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isEditing = !!task;
 
@@ -55,13 +56,11 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
     if (task) {
       setTitle(task.title);
       setDescription(task.description || "");
-      setPriority(task.priority);
       setStatus(task.status);
       setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
     } else {
       setTitle("");
       setDescription("");
-      setPriority("MEDIUM");
       setStatus("TODO");
       setDueDate(undefined);
     }
@@ -72,10 +71,10 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
     setIsLoading(true);
 
     try {
+      setError(null);
       const taskData = {
         title,
         description: description || undefined,
-        priority,
         status,
         dueDate: dueDate?.toISOString(),
       };
@@ -88,7 +87,7 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
 
       onOpenChange(false);
     } catch (error) {
-      console.error("Failed to save task:", error);
+      setError(error instanceof Error ? error.message : "Failed to save task");
     } finally {
       setIsLoading(false);
     }
@@ -109,6 +108,12 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="grid gap-2">
               <Label htmlFor="title">Title</Label>
               <Input
@@ -131,40 +136,21 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Priority</Label>
-                <Select
-                  value={priority}
-                  onValueChange={(value: TaskPriority) => setPriority(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="LOW">Low</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="HIGH">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid gap-2">
-                <Label>Status</Label>
-                <Select
-                  value={status}
-                  onValueChange={(value: TaskStatus) => setStatus(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="TODO">To Do</SelectItem>
-                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                    <SelectItem value="DONE">Done</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid gap-2">
+              <Label>Status</Label>
+              <Select
+                value={status}
+                onValueChange={(value: TaskStatus) => setStatus(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TODO">To Do</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="DONE">Done</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-2">
@@ -199,15 +185,12 @@ export function TaskDialog({ open, onOpenChange, task }: TaskDialogProps) {
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !title.trim()}>
-              {isLoading
-                ? "Saving..."
-                : isEditing
-                ? "Update Task"
-                : "Create Task"}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Saving..." : isEditing ? "Update" : "Create"}
             </Button>
           </DialogFooter>
         </form>

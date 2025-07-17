@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
@@ -47,19 +46,6 @@ export function TaskCard({ task, isDragging = false }: TaskCardProps) {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
       }
     : undefined;
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "HIGH":
-        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-      case "MEDIUM":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
-      case "LOW":
-        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300";
-    }
-  };
 
   const handleDelete = () => {
     deleteTask(task.id);
@@ -109,17 +95,12 @@ export function TaskCard({ task, isDragging = false }: TaskCardProps) {
           )}
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="flex items-center justify-between">
-            <Badge className={`text-xs ${getPriorityColor(task.priority)}`}>
-              {task.priority}
-            </Badge>
-            {task.dueDate && (
-              <div className="flex items-center text-xs text-muted-foreground">
-                <Calendar className="mr-1 h-3 w-3" />
-                {format(new Date(task.dueDate), "MMM dd")}
-              </div>
-            )}
-          </div>
+          {task.dueDate && (
+            <div className="flex items-center text-xs text-muted-foreground">
+              <Calendar className="mr-1 h-3 w-3" />
+              {format(new Date(task.dueDate), "MMM dd")}
+            </div>
+          )}
         </CardContent>
       </Card>
 
