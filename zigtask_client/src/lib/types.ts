@@ -1,33 +1,19 @@
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
-
-export interface User {
-  _id: string;
-  email: string;
-  createdAt: string;
-}
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 
 export interface Task {
-  _id: string;
+  id: string;
   title: string;
-  description: string;
-  dueDate: string | null;
+  description?: string;
   status: TaskStatus;
-  user: string;
+  priority: TaskPriority;
+  dueDate?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface CreateTaskData {
-  title: string;
-  description: string;
-  status: TaskStatus;
-  dueDate: string | null;
-  user: string;
-}
-
-export interface UpdateTaskData {
-  title?: string;
-  description?: string;
-  status?: TaskStatus;
-  dueDate?: string | null;
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
 }

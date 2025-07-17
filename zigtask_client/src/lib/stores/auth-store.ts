@@ -1,121 +1,69 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User } from "../types";
 
-interface AuthStore {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  clearError: () => void;
+interface User {
+  id: string;
+  email: string;
+  name?: string;
 }
 
-// Mock API functions - replace with actual API calls
-const mockLogin = async (email: string, password: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
+  setUser: (user: User) => void;
+}
 
+// Mock API functions - replace with real API calls
+const mockLogin = async (email: string, password: string) => {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Mock validation
   if (email === "demo@example.com" && password === "password") {
     return {
-      user: {
-        _id: "1",
-        email,
-        createdAt: new Date().toISOString(),
-      },
+      user: { id: "1", email, name: "Demo User" },
       token: "mock-jwt-token",
     };
   }
+
   throw new Error("Invalid credentials");
 };
 
-const mockSignup = async (email: string, password: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+const mockSignup = async (name: string, email: string, password: string) => {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return {
-    user: {
-      _id: Math.random().toString(36).substr(2, 9),
-      email,
-      createdAt: new Date().toISOString(),
-    },
+    user: { id: Date.now().toString(), email, name },
     token: "mock-jwt-token",
   };
 };
 
-export const useAuthStore = create<AuthStore>()(
+export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-
-      login: async (email: string, password: string) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          const { user, token } = await mockLogin(email, password);
-          set({
-            user,
-            token,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Login failed",
-            isLoading: false,
-          });
-          throw error;
-        }
+      login: async (email, password) => {
+        const { user, token } = await mockLogin(email, password);
+        set({ user, token });
       },
-
-      signup: async (email: string, password: string) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          const { user, token } = await mockSignup(email, password);
-          set({
-            user,
-            token,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Signup failed",
-            isLoading: false,
-          });
-          throw error;
-        }
+      signup: async (name, email, password) => {
+        const { user, token } = await mockSignup(name, email, password);
+        set({ user, token });
       },
-
       logout: () => {
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-          error: null,
-        });
+        set({ user: null, token: null });
       },
-
-      clearError: () => {
-        set({ error: null });
+      setUser: (user) => {
+        set({ user });
       },
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
-      }),
     }
   )
 );

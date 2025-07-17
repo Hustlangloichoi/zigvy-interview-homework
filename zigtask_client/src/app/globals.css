@@ -24,12 +24,6 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
-
-    /* Custom theme variables */
-    --sidebar: var(--background);
-    --sidebar-foreground: var(--foreground);
-    --task-card: var(--card);
-    --task-card-hover: 210 40% 98%;
   }
 
   .dark {
@@ -52,134 +46,14 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
-
-    /* Custom dark theme variables */
-    --sidebar: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --task-card: 217.2 32.6% 17.5%;
-    --task-card-hover: 217.2 32.6% 20%;
   }
 }
 
 @layer base {
   * {
-    border: 1px solid;
-    border-color: hsl(var(--border));
-    @apply transition-colors duration-200;
+    @apply border-border;
   }
-
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    transition: color 0.2s, background-color 0.2s;
-  }
-
-  /* Smooth transitions for theme changes */
-  html {
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-  }
-
-  /* Enhanced card styling with theme support */
-  .task-card {
-    background-color: hsl(var(--card));
-    border: 1px solid;
-    border-color: hsl(var(--border));
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition: box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
-  }
-
-  .task-card:hover {
-    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.1);
-  }
-
-  .task-card:hover {
-    background-color: hsl(var(--task-card-hover));
-    transform: translateY(-1px);
-  }
-
-  /* Column styling with theme support */
-  .kanban-column {
-    background-color: hsl(var(--muted) / 0.5);
-    border-radius: 0.5rem;
-    transition: color 0.2s, background-color 0.2s;
-  }
-
-  .kanban-column.drag-over {
-    background-color: hsl(var(--muted) / 0.8);
-  }
-
-  /* Enhanced button transitions */
-  button {
-    transition: all 0.2s;
-  }
-
-  /* Form elements with theme support */
-  input,
-  textarea,
-  select {
-    transition: color 0.2s, background-color 0.2s;
-  }
-
-  /* Modal and dialog transitions */
-  [data-state="open"] {
-    animation: slideIn 0.2s ease-out;
-  }
-
-  [data-state="closed"] {
-    animation: slideOut 0.2s ease-in;
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95) translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-
-  @keyframes slideOut {
-    from {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: scale(0.95) translateY(-10px);
-    }
-  }
-}
-
-@layer utilities {
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Theme-aware scrollbar */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted));
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: hsl(var(--muted));
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground));
-    border-radius: 3px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--foreground));
+    @apply bg-background text-foreground;
   }
 }
